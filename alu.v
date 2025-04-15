@@ -1,43 +1,24 @@
 `timescale 1ns / 1ps
-module alu(Y, Cout, A, B, S, sel);
+module alu(Y, Cout, A, B, S);
         output reg Cout;
         output reg [3:0] Y;
-        input sel;
         input [3:0] A,B;
-        input [15:0]S; 
+        input [3:0]S; 
         
-  always @ (A or B or S) begin
-                        if (S==0) 
-                                {Cout, Y}= A+B;
-                        else if (S==1)
-                                {Cout, Y}= A-B;
-                        else if (S==2)
-                                Y= A + (~B+1);
-                        else if (S==3) begin
-                                 if(sel==1)
-                                        {Cout,Y}=A+1;
-                                 else 
-                                        {Cout,Y}=B+1;
-                            end
-                      else if (S==4) begin
-                                  if(sel==1)
-                                        {Cout,Y}=A-1;
-                                 else 
-                                        {Cout,Y}=B-1;
-                            end
-                     else if (S==5)
-                            Y= A&B;
-                     else if (S==6)
-                            Y=A|B;
-                     else if (S==7)
-                            Y=A^B;
-                     else if (S==8)         
-                            Y=A~^B;
-                      else if (S==9)         
-                            Y=~(A&B);
-                      else if (S==9)         
-                            Y=~(A|B);
-                      else
-                            Y=4'b0000;
-   end
+  always @(*) begin
+          case (S)  // sel is the control input (e.g., 4-bit selector)
+    4'b0000: result = A + B;         // Addition
+    4'b0001: result = A - B;         // Subtraction
+    4'b0010: result = A + 1;         // Increment
+    4'b0011: result = A - 1;         // Decrement
+    4'b0100: result = ~A + 1;        // 2's Complement
+    4'b0101: result = A & B;         // AND
+    4'b0110: result = A | B;         // OR
+    4'b0111: result = A ^ B;         // XOR
+    4'b1000: result = ~(A & B);      // NAND
+    4'b1001: result = ~(A | B);      // NOR
+    4'b1010: result = ~(A ^ B);      // XNOR
+    default: result = 4'b0000;       // Default case
+  endcase
+end
 endmodule
